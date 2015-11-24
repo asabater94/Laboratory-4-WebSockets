@@ -71,7 +71,7 @@ public class ElizaServerTest {
 		List<String> list = new ArrayList<>();
 		ClientEndpointConfig configuration = ClientEndpointConfig.Builder.create().build();
 		ClientManager client = ClientManager.createClient();
-		client.connectToServer(new Endpoint() {
+		client.connectToServer(new Endpoint() { 
 
 			@Override
 			public void onOpen(Session session, EndpointConfig config) {
