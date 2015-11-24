@@ -49,6 +49,7 @@ public class ElizaServerTest {
 
 					@Override
 					public void onMessage(String message) {
+						// System.out.println(message);
 						list.add(message);
 						latch.countDown();
 					}
@@ -62,9 +63,11 @@ public class ElizaServerTest {
 	}
 
 	@Test(timeout = 1000)
-	@Ignore
 	public void onChat() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
-		// COMPLETE
+		CountDownLatch latch = new CountDownLatch(5); // We need 3 messages from
+														// the initial
+														// connection and 2 more
+														// from the response
 		List<String> list = new ArrayList<>();
 		ClientEndpointConfig configuration = ClientEndpointConfig.Builder.create().build();
 		ClientManager client = ClientManager.createClient();
@@ -73,22 +76,26 @@ public class ElizaServerTest {
 			@Override
 			public void onOpen(Session session, EndpointConfig config) {
 
-				// COMPLETE
+				session.getAsyncRemote().sendText("Are you a good doctor?");	// Answer to the server
 
 				session.addMessageHandler(new MessageHandler.Whole<String>() {
 
 					@Override
 					public void onMessage(String message) {
 						list.add(message);
-						// COMPLETE
+						latch.countDown();	// Decreases the messages needed 
 					}
 				});
 			}
 
 		}, configuration, new URI("ws://localhost:8025/websockets/eliza"));
-		// COMPLETE
-		// COMPLETE
-		// COMPLETE
+		latch.await(); // Wait for the 5 messages
+
+		//System.out.println(list);
+		
+		assertEquals(5, list.size());	// The list size must be 5
+		assertEquals("We were discussing you, not me.", list.get(3));	// There are only one possible 
+																			//response from the server
 	}
 
 	@After
